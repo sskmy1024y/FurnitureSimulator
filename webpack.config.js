@@ -25,5 +25,6 @@ module.exports = {
                 }
             }
         ]
-    }
+    },
+    cache: false
 };
