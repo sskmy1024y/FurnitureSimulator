@@ -4,15 +4,17 @@ import React3 from 'react-three-renderer';
 import * as THREE from 'three';
 import ReactDOM from 'react-dom';
 
+var OrbitControls = require('three-orbit-controls')(THREE)
 
 // onsenUI import
 import ons from 'onsenui';
 import { Navigator, Page, Button, Toolbar, BackButton, Card } from 'react-onsenui';
 
+var keys = 0;
 
 class MainPage extends Component {
     pushPage() {
-        this.props.navigator.pushPage({ component: ThreeJSPage });
+        this.props.navigator.pushPage({ component: ThreeJSPage, props: { key: ++keys } });
     }
 
     actionSheet() {
@@ -91,6 +93,7 @@ class ThreeJSPage extends Component {
         this.lightPosition = new THREE.Vector3(0, 100, 30);
 
         this.camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
+        this.camera.position
 
         this.state = {
             dirZ: -1,
@@ -124,8 +127,19 @@ class ThreeJSPage extends Component {
         };
     }
 
+    componentDidMount() {
+        const controls = new OrbitControls(this.refs.camera);
+        this.controls = controls;
+        //this.props.fetchPhotosWithTexture();
+    }
+
+    componentWillUnmount() {
+        this.controls.dispose();
+        delete this.controls;
+    }
+
     pushPage() {
-        this.props.navigator.pushPage({ component: ThirdPage });
+        this.props.navigator.pushPage({ component: ThirdPage, props: { key: ++keys } });
     }
 
     popPage() {
@@ -153,6 +167,7 @@ class ThreeJSPage extends Component {
                         <ambientLight color={0xaaaaaa} />
                         <perspectiveCamera
                             name="camera"
+                            ref="camera"
                             fov={45}
                             aspect={width / height}
                             near={1}
@@ -185,6 +200,26 @@ class ThreeJSPage extends Component {
     }
 }
 
+class SamplePlane extends Component {
+    render() {
+        return (
+            <mesh
+                position={this.state.planePosition}
+                rotation={this.state.planeRotation}
+            >
+                <planeGeometry
+                    width={this.props.texture.image.width / 2}
+                    height={this.props.texture.image.height / 2}
+                />
+                <meshLambertMaterial
+                    map={this.props.texture}
+                    side={THREE.DoubleSide}
+                />
+            </mesh>
+        );
+    }
+}
+
 
 export default class extends Component {
     renderPage(route, navigator) {
@@ -197,7 +232,7 @@ export default class extends Component {
     render() {
         return (
             <Navigator
-                initialRoute={{ component: MainPage }}
+                initialRoute={{ component: MainPage, props: { key: ++keys } }}
                 renderPage={this.renderPage}
             />
         );
