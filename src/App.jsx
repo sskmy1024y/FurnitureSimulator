@@ -4,8 +4,6 @@ import React3 from 'react-three-renderer';
 import * as THREE from 'three';
 import ReactDOM from 'react-dom';
 
-var OrbitControls = require('three-orbit-controls')(THREE)
- 
 
 // onsenUI import
 import ons from 'onsenui';
@@ -135,10 +133,6 @@ class ThreeJSPage extends Component {
     }
 
     render() {
-        this.camera.position.set(0, 0, 1000);
-        
-        this.controls = new OrbitControls(this.camera);
-
         return (
             <Page renderToolbar={() =>
                 <Toolbar>
@@ -190,6 +184,7 @@ class ThreeJSPage extends Component {
         );
     }
 }
+
 
 export default class extends Component {
     renderPage(route, navigator) {
