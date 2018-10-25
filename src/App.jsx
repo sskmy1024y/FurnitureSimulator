@@ -4,13 +4,19 @@ import React3 from 'react-three-renderer';
 import * as THREE from 'three';
 import ReactDOM from 'react-dom';
 
-var OrbitControls = require('three-orbit-controls')(THREE)
+import FSFLoader from './FSFLoader.jsx';
+import Furniture from './Furniture.jsx';
+
+var OrbitControls = require('three-orbit-controls')(THREE);
+var ColladaLoader = require('three-collada-loader')(THREE);
 
 // onsenUI import
 import ons from 'onsenui';
 import { Navigator, Page, Button, Toolbar, BackButton, Card } from 'react-onsenui';
 
 var keys = 0;
+
+
 
 class MainPage extends Component {
     pushPage() {
@@ -83,17 +89,20 @@ const rad = pi / 180;
 const width = window.innerWidth;
 const height = window.innerHeight;
 
+const Test = (props) => {
+    return (<div>{props.message}</div>)
+}
+
 class ThreeJSPage extends Component {
     constructor(props, context) {
         super(props, context);
 
         // construct the position vector here, because if we use 'new' within render,
         // React will think that things have changed when they have not.
-        this.cameraPosition = new THREE.Vector3(0, 100, 500);
-        this.lightPosition = new THREE.Vector3(0, 100, 30);
+        this.cameraPosition = new THREE.Vector3(0, 10, 10);
+        this.lightPosition = new THREE.Vector3(0, 0, 30);
 
-        this.camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-        this.camera.position
+        //this.camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
 
         this.state = {
             dirZ: -1,
@@ -101,6 +110,16 @@ class ThreeJSPage extends Component {
             planePosition: new THREE.Vector3(0, 0, 500),
             planeRotation: new THREE.Euler(0, 0, 0),
         };
+
+        this.movable = {
+            plane: new THREE.Plane(),
+            raycaster: new THREE.Raycaster(),
+            mouse: new THREE.Vector2(),
+            offset: new THREE.Vector3(),
+            intersection: new THREE.Vector3(),
+            mouseoverObj: undefined,
+            draggedObj: undefined
+        }
 
         this._onAnimate = () => {
             // we will get this callback every frame
@@ -125,12 +144,27 @@ class ThreeJSPage extends Component {
 
             });
         };
+
     }
 
     componentDidMount() {
         const controls = new OrbitControls(this.refs.camera);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.5;
         this.controls = controls;
-        //this.props.fetchPhotosWithTexture();
+
+        const url = './test.fsf';
+        var fl;
+        fetch(url).then((responce) => {
+            return responce.json();
+        }).then((fsf) => {
+            fsf.scene = this.refs.scene;
+            fl = new FSFLoader(fsf);
+
+            /* controls */
+            fl.putFurnituresAll();
+        });
+
     }
 
     componentWillUnmount() {
@@ -161,10 +195,16 @@ class ThreeJSPage extends Component {
                     clearColor={0x000000}
                     pixelRatio={window.devicePixelRatio}
                     onAnimate={this._onAnimate.bind(this)}
+                    onMouseDown={}
+                    onMouseMove={}
+                    onMouseUp={}
                 >
-                    <scene>
-                        <directionalLight position={this.lightPosition} />
-                        <ambientLight color={0xaaaaaa} />
+                    <scene ref="scene">
+                        <directionalLight
+                            position={this.lightPosition}
+                            color={0xFFFFFF}
+                        />
+                        <ambientLight color={0x333333} />
                         <perspectiveCamera
                             name="camera"
                             ref="camera"
@@ -177,21 +217,6 @@ class ThreeJSPage extends Component {
                         <gridHelper size={200} step={50} />
                         <axisHelper size={1000} />
 
-                        {this.props.texture ?
-                            <mesh
-                                position={this.state.planePosition}
-                                rotation={this.state.planeRotation}
-                            >
-                                <planeGeometry
-                                    width={this.props.texture.image.width / 2}
-                                    height={this.props.texture.image.height / 2}
-                                />
-                                <meshLambertMaterial
-                                    map={this.props.texture}
-                                    side={THREE.DoubleSide}
-                                />
-                            </mesh>
-                            : null}
                     </scene>
                 </React3>
 
@@ -199,27 +224,6 @@ class ThreeJSPage extends Component {
         );
     }
 }
-
-class SamplePlane extends Component {
-    render() {
-        return (
-            <mesh
-                position={this.state.planePosition}
-                rotation={this.state.planeRotation}
-            >
-                <planeGeometry
-                    width={this.props.texture.image.width / 2}
-                    height={this.props.texture.image.height / 2}
-                />
-                <meshLambertMaterial
-                    map={this.props.texture}
-                    side={THREE.DoubleSide}
-                />
-            </mesh>
-        );
-    }
-}
-
 
 export default class extends Component {
     renderPage(route, navigator) {
