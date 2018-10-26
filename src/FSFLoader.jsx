@@ -5,20 +5,26 @@ import * as THREE from 'three';
 import ReactDOM from 'react-dom';
 
 import Furniture from './Furniture.jsx';
-
-const OrbitControls = require('three-orbit-controls')(THREE)
-const ColladaLoader = require('three-collada-loader');
+import Room from './Room.jsx';
 
 export default class FSFLoader {
     constructor(props){
         this.scene = props.scene;
-        this.furnitures = [];
+        this.room = null;
+        this.objects = {
+            furnitures: []
+        };
+
+        if (props.world){
+            this.room = new Room(props.world);
+        }
 
         if (props.furnitures.length > 0){
             props.furnitures.forEach(data => {
-                let furniture = new Furniture(data);
-                this.furnitures.push(furniture);
+                if (data.modelid && props.objects[data.modelid]) this.objects.furnitures.push(props.objects[data.modelid]); 
             });
+            console.log(this.objects);
+            
         }
     }
 
@@ -30,11 +36,16 @@ export default class FSFLoader {
 
     }
 
-    putFurnituresAll(){
-        this.furnitures.forEach(furniture => {
-            furniture.putScene(this.scene); 
+    setRoom(){
+        this.room.set(this.scene);
+    }
+
+    putFurnituresAll(list){
+        this.objects.furnitures.forEach(furniture => {
+            furniture.putScene(this.scene, list);
         });
     }
+    
     
 }
 

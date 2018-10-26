@@ -8,13 +8,39 @@ import FSFLoader from './FSFLoader.jsx';
 import Furniture from './Furniture.jsx';
 
 var OrbitControls = require('three-orbit-controls')(THREE);
-var ColladaLoader = require('three-collada-loader')(THREE);
+import DeviceOrientationControls from 'three-device-orientation';
 
 // onsenUI import
 import ons from 'onsenui';
 import { Navigator, Page, Button, Toolbar, BackButton, Card } from 'react-onsenui';
 
 var keys = 0;
+
+
+var ua = navigator.userAgent;
+if (ua.indexOf('iPhone') > 0 || ua.indexOf('iPod') > 0 || ua.indexOf('Android') > 0) {
+    var sp = true;
+} else if (ua.indexOf('iPad') > 0 || ua.indexOf('Android') > 0) {
+    var sp = true;
+}
+
+var objects = {};
+
+function LoadObjects() {
+
+    fetch("./Furnitures.json").then((responce) => {
+        return responce.json();
+    }).then((json) => {
+        json.forEach(data => {
+            let obj = new Furniture(data);
+            objects[data.modelid] = obj;
+        });
+        console.log(objects);
+        
+    });
+
+}
+LoadObjects();
 
 
 
@@ -97,19 +123,10 @@ class ThreeJSPage extends Component {
     constructor(props, context) {
         super(props, context);
 
-        // construct the position vector here, because if we use 'new' within render,
-        // React will think that things have changed when they have not.
-        this.cameraPosition = new THREE.Vector3(0, 10, 10);
+        this.objects = [];
+
+        this.cameraPosition = new THREE.Vector3(0, 5, 5);
         this.lightPosition = new THREE.Vector3(0, 0, 30);
-
-        //this.camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-
-        this.state = {
-            dirZ: -1,
-            dirRad: rad,
-            planePosition: new THREE.Vector3(0, 0, 500),
-            planeRotation: new THREE.Euler(0, 0, 0),
-        };
 
         this.movable = {
             plane: new THREE.Plane(),
@@ -117,59 +134,113 @@ class ThreeJSPage extends Component {
             mouse: new THREE.Vector2(),
             offset: new THREE.Vector3(),
             intersection: new THREE.Vector3(),
-            mouseoverObj: undefined,
-            draggedObj: undefined
+            mouseoverObj: null,
+            draggedObj: null
         }
 
         this._onAnimate = () => {
-            // we will get this callback every frame
-
-            // pretend cubeRotation is immutable.
-            // this helps with updates and pure rendering.
-            // React will be sure that the rotation has now updated.
-
-
-
-            this.setState({
-                planePosition: new THREE.Vector3(
-                    this.state.planePosition.x,
-                    this.state.planePosition.y,
-                    this.state.planePosition.z + this.state.dirZ
-                ),
-                planeRotation: new THREE.Euler(
-                    this.state.planeRotation.x + this.state.dirRad,
-                    this.state.planeRotation.y,
-                    this.state.planeRotation.z + this.state.dirRad
-                )
-
-            });
+            if (sp) this.controls.update();
         };
 
     }
 
-    componentDidMount() {
-        const controls = new OrbitControls(this.refs.camera);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.5;
-        this.controls = controls;
+    componentWillMount() {
+        const url = "./Furnitures.json";
+        fetch(url).then((responce) => {
+            return responce.json();
+        }).then((furnitures) => {
 
+        });
+    }
+
+    componentDidMount() {
+
+        var controls;
+        if (sp) {
+            controls = new DeviceOrientationControls(this.refs.camera);
+            this.controls = controls;
+        } else {
+            controls = new OrbitControls(this.refs.camera);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.5;
+            this.controls = controls;
+        }
+
+        //load fsf files.
         const url = './test.fsf';
         var fl;
         fetch(url).then((responce) => {
             return responce.json();
-        }).then((fsf) => {
-            fsf.scene = this.refs.scene;
-            fl = new FSFLoader(fsf);
+        }).then((fsfile) => {
+            fsfile.scene = this.refs.scene;
+            fsfile.objects = objects;
+            fl = new FSFLoader(fsfile);
 
             /* controls */
-            fl.putFurnituresAll();
+            fl.setRoom();
+            fl.putFurnituresAll(this.objects);
+
         });
+
 
     }
 
     componentWillUnmount() {
         this.controls.dispose();
         delete this.controls;
+    }
+
+
+    _onDocumentMouseDown(event) {
+        event.preventDefault();
+
+        this.raycaster.setFromCamera(this.movable.mouse, this.refs.camera);
+        const intersects = this.raycaster.intersectObjects(this.objects);
+
+        if (intersects.length > 0) {
+            controls.enabled = false;
+
+            draggedObj = intersects[0].object;
+
+            if (raycaster.ray.intersectPlane(plane, intersection)) {
+                offset.copy(intersection).sub(draggedObj.position);
+            }
+        }
+    }
+
+    _onDocumentMouseMove(event) {
+        event.preventDefault();
+
+        this.movable.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.movable.mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.movable.mouse, this.refs.camera);
+
+        if (this.movable.draggedObj) {
+            if (this.movable.raycaster.ray.intersectPlane(this.movable.plane, this.movable.intersection)) {
+                this.movable.draggedObj.position.copy(this.movable.intersection.sub(offset));
+            }
+        } else {
+            const intersects = this.movable.raycaster.intersectObjects(this.objects);
+
+            if (intersects.length > 0) {
+                if (this.movable.mouseoveredObj != intersects[0].object) {
+                    this.movable.mouseoveredObj = intersects[0].object;
+                    this.refs.camera.getWorldDirection(this.movable.plane.normal);
+                }
+            } else {
+                this.movable.mouseoveredObj = null;
+            }
+        }
+    }
+
+    _onDocumentMouseUp(event) {
+        event.preventDefault();
+        this.movable.controls.enabled = true;
+
+        if (this.movable.mouseoveredObj) {
+            this.movable.draggedObj = null;
+        }
     }
 
     pushPage() {
@@ -195,9 +266,6 @@ class ThreeJSPage extends Component {
                     clearColor={0x000000}
                     pixelRatio={window.devicePixelRatio}
                     onAnimate={this._onAnimate.bind(this)}
-                    onMouseDown={}
-                    onMouseMove={}
-                    onMouseUp={}
                 >
                     <scene ref="scene">
                         <directionalLight

@@ -34,7 +34,11 @@
     "redux": "^4.0.1",
     "style-loader": "^0.23.1",
     "three": "^0.86.0",
+    "three-3dsloader": "^1.0.2",
     "three-collada-loader": "0.0.1",
+    "three-device-orientation": "^1.0.3",
+    "three-loaders-collada": "^1.0.2",
+    "three-obj-mtl-loader": "^1.0.3",
     "three-orbit-controls": "^82.1.0",
     "webpack": "^4.21.0",
     "webpack-cli": "^3.1.2"

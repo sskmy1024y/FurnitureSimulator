@@ -3,38 +3,53 @@ import React, { Component } from 'react';
 import React3 from 'react-three-renderer';
 import * as THREE from 'three';
 import ReactDOM from 'react-dom';
+import { runInThisContext } from 'vm';
 
 var OrbitControls = require('three-orbit-controls')(THREE)
 var ColladaLoader = require('three-collada-loader');
+var TDSLoader = require('three-3dsloader');
+import { MTLLoader, OBJLoader } from 'three-obj-mtl-loader';
 
 export default class Furniture {
     constructor(data) {
-        this.id = data.modelid || undefined;
-        this.src_path = data.src_path;
+        this.id = data.modelid || null;
+        this.type = data.type;
+        this.main_src = data.main_src;
+        this.texture_src = data.texture_src || null;
         this.position = data.position || { "x": 0, "y": 0, "z": 0 };
+        this.scale = null;
     }
 
-
-    getSrc_path() {
-        return this.src_path;
+    getMainSrc() {
+        return this.main_src;
     }
 
     getPosition() {
         return this.position;
     }
 
-    putScene(scene) {
-        console.log(scene);
-        
-        // 3DS形式のモデルデータを読み込む
+    putScene(scene, list) {
+        if (!this.type) return -1;
+
+        switch (this.type) {
+            case "dae":
+                this._putSceneDEA(scene);
+                break;
+            case "mtl-obj":
+                this._putSceneOBJ(scene);
+                break;
+            case "3ds":
+                this._putScene3DS(scene);
+                break;
+
+        }
+    }
+
+    _putSceneDEA(scene) {
         const loader = new ColladaLoader();
         loader.options.convertUpAxis = true;
-        // 3dsファイルのパスを指定
-        loader.load(this.src_path, (collada) => {
-            // 読み込み後に3D空間に追加
-            var model = collada.scene;
-            console.log(model);
-            
+        loader.load(this.main_src, (collada) => {
+            let model = collada.scene;
             model.position.x = this.position.x || 0;
             //よくわからないけど、yとzが変
             //model.position.y = this.position.y || 0;
@@ -42,6 +57,32 @@ export default class Furniture {
             model.position.y = this.position.z || 0;
             model.position.z = this.position.y || 0;
 
+            scene.add(model);
+        })
+    }
+
+    _putSceneOBJ(scene) {
+        let objloader = new OBJLoader();
+        let mtlLoader = new MTLLoader();
+        mtlLoader.load(this.texture_src, (materials) => {
+            materials.preload();
+            objloader.setMaterials(materials);
+            objloader.load(this.main_src, (model) => {
+                model.position.x = this.position.x || 0;
+                model.position.y = this.position.z || 0;
+                model.position.z = this.position.y || 0;
+                scene.add(model);
+            })
+        });
+    }
+
+    _putScene3DS(scene) {
+        var tdsLoader = new TDSLoader();
+        tdsLoader.setPath(this.texture_src);
+        tdsLoader.load(this.main_src, (model) => {
+            model.position.x = this.position.x || 0;
+            model.position.y = this.position.z || 0;
+            model.position.z = this.position.y || 0;
             scene.add(model);
         });
     }
