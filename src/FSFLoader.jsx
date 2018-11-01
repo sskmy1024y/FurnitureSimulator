@@ -21,7 +21,13 @@ export default class FSFLoader {
 
         if (props.furnitures.length > 0){
             props.furnitures.forEach(data => {
-                if (data.id && props.objects[data.id]) this.objects.furnitures.push(props.objects[data.id]); 
+                if (data.id && props.objects[data.id]) {
+                    let obj = props.objects[data.id];
+                    if (data.position) obj.setPosition(data.position.x, data.position.y, data.position.z);
+                    if (data.rotation) obj.setRotation(data.rotation.x, data.rotation.y, data.rotation.z);
+                    if (data.scale) obj.setScale(data.scale.x, data.scale.y, data.scale.z);
+                    this.objects.furnitures.push(obj); 
+                }
             });
             console.log(this.objects);
             

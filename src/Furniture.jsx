@@ -16,9 +16,10 @@ export default class Furniture {
         this.file_type = data.file_type;
         this.main_src = data.main_src;
         this.texture_src = data.texture_src || null;
-        this.position = data.position || { "x": 0, "y": 0, "z": 0 };
-        this.rotation = data.rotation || { "x": 0, "y": 0, "z": 0 };
-        this.scale = data.scale || { "x": 1, "y": 1, "z": 1 };
+        
+        this.position = {x: 0, y: 0, z: 0};
+        this.rotation = {x: 0, y: 0, z: 0};
+        this.scale = data.default_scale || {x: 0, y: 0, z: 0};
     }
 
     getMainSrc() {
@@ -52,14 +53,14 @@ export default class Furniture {
         loader.load(this.main_src, (collada) => {
             let model = collada.scene;
             model.position.x = this.position.x || 0;
-            //よくわからないけど、yとzが変
-            //model.position.y = this.position.y || 0;
-            //model.position.z = this.position.z || 0;
-            model.position.y = this.position.z || 0;
-            model.position.z = this.position.y || 0;
-
-            console.log(this.scale);
+            model.position.y = this.position.y || 0;
+            model.position.z = this.position.z || 0;
             
+            model.rotation.x = this.rotation.x || 0;
+            model.rotation.y = this.rotation.y || 0;
+            model.rotation.z = this.rotation.z || 0;
+            
+
             model.scale.x = this.scale.x || 1;
             model.scale.y = this.scale.y || 1;
             model.scale.z = this.scale.z || 1;
@@ -93,6 +94,24 @@ export default class Furniture {
             model.position.z = this.position.y || 0;
             scene.add(model);
         });
+    }
+
+    setPosition(x, y, z){
+        if (x) this.position.x = x;
+        if (y) this.position.y = y;
+        if (z) this.position.z = z;
+    }
+
+    setRotation(x, y, z){
+        if (x) this.rotation.x = Math.PI * x;
+        if (y) this.rotation.y = Math.PI * y;
+        if (z) this.rotation.z = Math.PI * z;
+    }
+
+    setScale(x, y, z){
+        if (x) this.scale.x = x;
+        if (y) this.scale.y = y;
+        if (z) this.scale.z = z;
     }
 
 }

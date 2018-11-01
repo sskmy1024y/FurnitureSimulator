@@ -20,7 +20,7 @@ export default class Room {
         this.materials = [];
 
         this.planeGeometry = new THREE.PlaneGeometry(this.size, this.size, this.size);
-        this.wallGeometry = new THREE.BoxGeometry(1, 1, 10);
+        this.wallGeometry = new THREE.BoxGeometry(1, 1, this.wallHeight);
 
         data.textures.forEach(texture_data => {
             let texture = THREE.ImageUtils.loadTexture(texture_data['texture_path']);

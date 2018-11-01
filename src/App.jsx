@@ -24,6 +24,7 @@ if (ua.indexOf('iPhone') > 0 || ua.indexOf('iPod') > 0 || ua.indexOf('Android') 
     var sp = true;
 }
 
+//モデルデータのみ格納
 var objects = {};
 
 function LoadObjects() {
@@ -418,7 +419,7 @@ class FurnitureTestPage extends Component {
                         />
                         <gridHelper size={200} step={50} />
                         <axisHelper size={1000} />
-                        
+
                     </scene>
                 </React3>
             </Page>

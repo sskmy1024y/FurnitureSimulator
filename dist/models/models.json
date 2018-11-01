@@ -34,5 +34,10 @@
     ],
     "file_type": "dae",
     "main_src": "./models/furnitures/Room-Door/Door_Component_BI3.dae",
-    "texture_src": null
+    "texture_src": null,
+    "default_scale": {
+        "x": 4.8,
+        "y": 4.8,
+        "z": 4.8
+    }
 }]
