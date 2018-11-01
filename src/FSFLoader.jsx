@@ -21,7 +21,7 @@ export default class FSFLoader {
 
         if (props.furnitures.length > 0){
             props.furnitures.forEach(data => {
-                if (data.modelid && props.objects[data.modelid]) this.objects.furnitures.push(props.objects[data.modelid]); 
+                if (data.id && props.objects[data.id]) this.objects.furnitures.push(props.objects[data.id]); 
             });
             console.log(this.objects);
             
@@ -36,6 +36,9 @@ export default class FSFLoader {
 
     }
 
+    getRoom(){
+        return this.room;
+    }
     setRoom(){
         this.room.set(this.scene);
     }

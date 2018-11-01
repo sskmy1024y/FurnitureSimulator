@@ -1,0 +1,38 @@
+[{
+    "id": 100,
+    "name": "pillow1",
+    "tags":[
+        "pillow"
+    ],
+    "file_type": "dae",
+    "main_src": "./models/furnitures/pillow/Pillow DAE.dae",
+    "texture_src": null,
+    "_comment": "枕は100番代(とか決めておく)"
+},{
+    "id": 200,
+    "name": "chair1",
+    "tags": [
+        "chair"
+    ],
+    "file_type": "mtl-obj",
+    "main_src": "./models/furnitures/office_chair/office_chair.obj",
+    "texture_src": "./models/furnitures/office_chair/office_chair.mtl"
+},{
+    "id": 300,
+    "name": "shelvers1",
+    "tags":[
+        "shelvers1"
+    ],
+    "file_type": "3ds",
+    "main_src": "./models/furnitures/shelvers/Shelvers.3ds",
+    "texture_src": "./models/furnitures/shelvers/"
+},{
+    "id": 400,
+    "name": "door1",
+    "tags":[
+        "door"
+    ],
+    "file_type": "dae",
+    "main_src": "./models/furnitures/Room-Door/Door_Component_BI3.dae",
+    "texture_src": null
+}]

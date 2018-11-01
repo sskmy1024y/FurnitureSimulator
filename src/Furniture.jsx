@@ -12,12 +12,13 @@ import { MTLLoader, OBJLoader } from 'three-obj-mtl-loader';
 
 export default class Furniture {
     constructor(data) {
-        this.id = data.modelid || null;
-        this.type = data.type;
+        this.id = data.id || null;
+        this.file_type = data.file_type;
         this.main_src = data.main_src;
         this.texture_src = data.texture_src || null;
         this.position = data.position || { "x": 0, "y": 0, "z": 0 };
-        this.scale = null;
+        this.rotation = data.rotation || { "x": 0, "y": 0, "z": 0 };
+        this.scale = data.scale || { "x": 1, "y": 1, "z": 1 };
     }
 
     getMainSrc() {
@@ -29,9 +30,9 @@ export default class Furniture {
     }
 
     putScene(scene, list) {
-        if (!this.type) return -1;
+        if (!this.file_type) return -1;
 
-        switch (this.type) {
+        switch (this.file_type) {
             case "dae":
                 this._putSceneDEA(scene);
                 break;
@@ -57,6 +58,13 @@ export default class Furniture {
             model.position.y = this.position.z || 0;
             model.position.z = this.position.y || 0;
 
+            console.log(this.scale);
+            
+            model.scale.x = this.scale.x || 1;
+            model.scale.y = this.scale.y || 1;
+            model.scale.z = this.scale.z || 1;
+
+            model.updateMatrix();
             scene.add(model);
         })
     }

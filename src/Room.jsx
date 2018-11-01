@@ -36,12 +36,13 @@ export default class Room {
                 if (!this.materials[this.mapData[xCounter][zCounter]]) continue;
                 const material = this.materials[this.mapData[xCounter][zCounter]];
                 let plane = new THREE.Mesh(this.planeGeometry, material);
-                plane.position.x = (xCounter - this.mapData.length / 2) * this.size;
-                plane.position.z = (zCounter - this.mapData[0].length / 2) * this.size;
+                plane.position.x = xCounter * this.size;
+                plane.position.z = zCounter * this.size;
                 plane.rotation.x = Math.PI / 360 * 180;
                 scene.add(plane);
             }
         }
+
         //Wall
         for (var xCounter = 0; xCounter < this.wallData.length; xCounter++) {
             for (var zCounter = 0; zCounter < this.wallData[0].length; zCounter++) {
@@ -49,13 +50,21 @@ export default class Room {
                     if (!this.wallData[this.wallData[xCounter][zCounter]]) continue;
                     const material = this.materials[this.wallData[xCounter][zCounter]];
                     let wall = new THREE.Mesh(this.wallGeometry, material);
-                    wall.position.x = (xCounter - this.wallData.length / 2) * this.size;
-                    wall.position.z = (zCounter - this.wallData[0].length / 2) * this.size;
+                    wall.position.x = xCounter * this.size;
+                    wall.position.z = (this.wallData[0].length -zCounter)-1 * this.size;
                     wall.position.y = this.wallHeight/2;
                     wall.rotation.x = Math.PI / 360 * 180;
                     scene.add(wall);
                 }
             }
         }
+    }
+
+    getCenter(){
+        return {
+            x: this.wallData.length /2,
+            y: this.wallHeight /2,
+            z: this.wallData[0].length /2
+        };
     }
 }

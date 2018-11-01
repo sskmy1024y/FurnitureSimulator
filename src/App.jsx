@@ -12,7 +12,7 @@ import DeviceOrientationControls from 'three-device-orientation';
 
 // onsenUI import
 import ons from 'onsenui';
-import { Navigator, Page, Button, Toolbar, BackButton, Card } from 'react-onsenui';
+import { Navigator, Page, Button, Toolbar, BackButton, Card, SpeedDial, SpeedDialItem, Fab, Icon } from 'react-onsenui';
 
 var keys = 0;
 
@@ -28,15 +28,15 @@ var objects = {};
 
 function LoadObjects() {
 
-    fetch("./Furnitures.json").then((responce) => {
+    fetch("./models/models.json").then((responce) => {
         return responce.json();
     }).then((json) => {
         json.forEach(data => {
             let obj = new Furniture(data);
-            objects[data.modelid] = obj;
+            objects[data.id] = obj;
         });
         console.log(objects);
-        
+
     });
 
 }
@@ -62,7 +62,9 @@ class MainPage extends Component {
                     modifier: 'destructive'
                 }
             ]
-        }).then(function (index) { console.log('index: ', index) });
+        }).then((index) => {
+            if (index == 0) this.props.navigator.pushPage({ component: FurnitureTestPage, props: { key: ++keys }});
+        });
     }
 
     render() {
@@ -125,7 +127,7 @@ class ThreeJSPage extends Component {
 
         this.objects = [];
 
-        this.cameraPosition = new THREE.Vector3(0, 5, 5);
+        this.cameraPosition = new THREE.Vector3(5, 8, 8);
         this.lightPosition = new THREE.Vector3(0, 0, 30);
 
         this.movable = {
@@ -138,6 +140,8 @@ class ThreeJSPage extends Component {
             draggedObj: null
         }
 
+        this.spControl = false;
+
         this._onAnimate = () => {
             if (sp) this.controls.update();
         };
@@ -145,7 +149,7 @@ class ThreeJSPage extends Component {
     }
 
     componentWillMount() {
-        const url = "./Furnitures.json";
+        const url = "./models/models.json";
         fetch(url).then((responce) => {
             return responce.json();
         }).then((furnitures) => {
@@ -154,9 +158,9 @@ class ThreeJSPage extends Component {
     }
 
     componentDidMount() {
-
-        var controls;
+        let controls;
         if (sp) {
+            this.spControl = true;
             controls = new DeviceOrientationControls(this.refs.camera);
             this.controls = controls;
         } else {
@@ -180,6 +184,10 @@ class ThreeJSPage extends Component {
             fl.setRoom();
             fl.putFurnituresAll(this.objects);
 
+            const cter = fl.getRoom().getCenter();
+            let newPosition = new THREE.Vector3(cter.x, cter.y, cter.z);
+            this.cameraPosition = newPosition;
+            this.controls.target = newPosition;
         });
 
 
@@ -243,6 +251,24 @@ class ThreeJSPage extends Component {
         }
     }
 
+    _changeControl() {
+        let controls;
+        console.log(this.spControl);
+        
+        if (sp) {
+            if (this.spControl == true) {
+                this.spControl = false;
+                controls = new OrbitControls(this.refs.camera);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.5;
+            } else {
+                this.spControl = true;
+                controls = new DeviceOrientationControls(this.refs.camera2);
+            }
+            this.controls = controls;
+        }
+    }
+
     pushPage() {
         this.props.navigator.pushPage({ component: ThirdPage, props: { key: ++keys } });
     }
@@ -287,7 +313,114 @@ class ThreeJSPage extends Component {
 
                     </scene>
                 </React3>
+                {(() => {
+                    if (sp) {
+                        return (
+                            <SpeedDial disabled={false} direction='right' onClick={() => console.log('test1')} position='left bottom'>
+                                <Fab>
+                                    <Icon icon='fa-twitter' size={26} fixedWidth={false} style={{ verticalAlign: 'middle' }} />
+                                </Fab>
 
+                                <SpeedDialItem onClick={this._changeControl.bind(this)}> C </SpeedDialItem>
+                            </SpeedDial>
+                        )
+                    }
+                })()}
+            </Page>
+        );
+    }
+}
+
+
+class FurnitureTestPage extends Component {
+    constructor(props, context) {
+        super(props, context);
+
+        this.cameraPosition = new THREE.Vector3(5, 8, 8);
+        this.lightPosition = new THREE.Vector3(0, 0, 30);
+
+    }
+
+    componentWillMount() {
+        const url = "./models/models.json";
+        fetch(url).then((responce) => {
+            return responce.json();
+        }).then((furnitures) => {
+
+        });
+    }
+
+    componentDidMount() {
+        let controls = new OrbitControls(this.refs.camera);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.5;
+        this.controls = controls;
+
+        //load fsf files.
+        const url = './test.fsf';
+        var fl;
+        fetch(url).then((responce) => {
+            return responce.json();
+        }).then((fsfile) => {
+            fsfile.scene = this.refs.scene;
+            fsfile.objects = objects;
+            fl = new FSFLoader(fsfile);
+
+            /* controls */
+            //fl.setRoom();
+            fl.putFurnituresAll(this.objects);
+        });
+
+    }
+
+    componentWillUnmount() {
+        this.controls.dispose();
+        delete this.controls;
+    }
+
+    pushPage() {
+        this.props.navigator.pushPage({ component: ThirdPage, props: { key: ++keys } });
+    }
+
+    popPage() {
+        this.props.navigator.popPage();
+    }
+
+    render() {
+        return (
+            <Page renderToolbar={() =>
+                <Toolbar>
+                    <div className="left"><BackButton>Back</BackButton></div>
+                    <div className="center">3D Test</div>
+                </Toolbar>
+            }>
+                <React3
+                    mainCamera="camera"
+                    width={width}
+                    height={height}
+                    clearColor={0x000000}
+                    pixelRatio={window.devicePixelRatio}
+                >
+                    <scene ref="scene">
+                        <directionalLight
+                            position={this.lightPosition}
+                            color={0xFFFFFF}
+                        />
+                        <ambientLight color={0x333333} />
+                        <perspectiveCamera
+                            name="camera"
+                            ref="camera"
+                            fov={45}
+                            aspect={width / height}
+                            near={1}
+                            far={2000}
+                            position={this.cameraPosition}
+                        />
+                        <gridHelper size={200} step={50} />
+                        <axisHelper size={1000} />
+                        
+                    </scene>
+                </React3>
             </Page>
         );
     }
