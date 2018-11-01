@@ -80,6 +80,18 @@ export default class Furniture {
                 model.position.x = this.position.x || 0;
                 model.position.y = this.position.z || 0;
                 model.position.z = this.position.y || 0;
+                
+                model.rotation.x = this.rotation.x || 0;
+                model.rotation.y = this.rotation.y || 0;
+                model.rotation.z = this.rotation.z || 0;
+                
+    
+                model.scale.x = this.scale.x || 1;
+                model.scale.y = this.scale.y || 1;
+                model.scale.z = this.scale.z || 1;
+    
+                model.updateMatrix();
+
                 scene.add(model);
             })
         });
@@ -92,6 +104,17 @@ export default class Furniture {
             model.position.x = this.position.x || 0;
             model.position.y = this.position.z || 0;
             model.position.z = this.position.y || 0;
+            
+            model.rotation.x = this.rotation.x || 0;
+            model.rotation.y = this.rotation.y || 0;
+            model.rotation.z = this.rotation.z || 0;
+            
+
+            model.scale.x = this.scale.x || 1;
+            model.scale.y = this.scale.y || 1;
+            model.scale.z = this.scale.z || 1;
+
+            model.updateMatrix();
             scene.add(model);
         });
     }
