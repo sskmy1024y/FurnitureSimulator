@@ -1,9 +1,9 @@
 # Furniture Simulator
 
 ## FSF File
-It's Room and Furniture maps file. Actually, just JSON file. Sample file is `dist/test.fsf`.
+It's Room and Furniture maps file. Actually, just JSON file. Sample file is `dist/test.fsf`.
 
-Furniture list is `dist/models/models.json`. It's all Furniture include.
+Furniture list is `dist/models/models.json`. It's all Furniture include.
 
 ```JSON
 {
