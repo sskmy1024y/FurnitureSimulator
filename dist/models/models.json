@@ -40,4 +40,77 @@
         "y": 4.8,
         "z": 4.8
     }
-}]
+},{
+    "id": 500,
+    "name": "table-black",
+    "tags":[
+        "table"
+    ],
+    "file_type": "mtl-obj",
+    "main_src": "./models/furnitures/table/BlackTable/000.obj",
+    "texture_src": "./models/furnitures/table/BlackTable/000.mtl"
+},{
+    "id": 600,
+    "name": "computer-desk",
+    "tags":[
+        "desk"
+    ],
+    "file_type": "mtl-obj",
+    "main_src": "./models/furnitures/desk/ComputerDesk/Computer_desk.obj",
+    "texture_src": "./models/furnitures/desk/ComputerDesk/Computer_desk.mtl"
+},{
+    "id": 700,
+    "name": "single-bed",
+    "tags":[
+        "bed"
+    ],
+    "file_type": "mtl-obj",
+    "main_src": "./models/furnitures/bed/single.obj",
+    "texture_src": "./models/furnitures/bed/single.mtl"
+},{
+    "id": 800,
+    "name": "curtain",
+    "tags":[
+        "curtain"
+    ],
+    "file_type": "3ds",
+    "main_src": "./models/furnitures/curtain/gray.3ds",
+    "texture_src": "./models/furnitures/curtain/"
+},{
+    "id": 900,
+    "name": "tv-set",
+    "tags":[
+        "tv"
+    ],
+    "file_type": "mtl-obj",
+    "main_src": "./models/furnitures/tv/tv_and_table.obj",
+    "texture_src": "./models/furnitures/tv/tv_and_table.mtl"
+},{
+    "id": 1000,
+    "name": "floor-lamp",
+    "tags":[
+        "lamp"
+    ],
+    "file_type": "mtl-obj",
+    "main_src": "./models/furnitures/floor_lamp/floor_lamp.obj",
+    "texture_src": "./models/furnitures/floor_lamp/floor_lamp.mtl"
+},{
+    "id": 1100,
+    "name": "plant",
+    "tags":[
+        "plant"
+    ],
+    "file_type": "3ds",
+    "main_src": "./models/furnitures/plant/plant.3ds",
+    "texture_src": "./models/furnitures/plant/"
+},{
+    "id": 1200,
+    "name": "rug",
+    "tags":[
+        "rug"
+    ],
+    "file_type": "3ds",
+    "main_src": "./models/furnitures/rug/rug2.3ds",
+    "texture_src": "./models/furnitures/rug/"
+}
+]
